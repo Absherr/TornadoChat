@@ -1,0 +1,10 @@
+#chat {
+    height: 100px;
+    overflow: auto;
+    width: 500px;
+    background-color: #ffe9bf;
+}
+
+.message{
+    width: 100%;
+}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <link href="/static/styles.css" rel="stylesheet">
+</head>
+<body>
+Your login: <input type="text" id="login" placeholder="login">
+
+<div id="chat">
+
+</div>
+
+<input type="text" id="msg" placeholder="Message">
+
+<input type="button" id="btn" onclick="sendMsg()" value="Send">
+<input type="button" id="rfs" onclick="refresh()" value="Refresh">
+
+<script>
+    $("#msg").keypress(function(event){
+        code = event.keyCode? event.keyCode : event.charCode;
+        if(code==13){
+            $("#btn").click();
+        }
+    });
+
+    function updateChat(data){
+        $("#chat").empty();
+        for(var i=0;i<data["length"];i++){
+            putToChat(data[i]);
+        }
+    }
+
+    function putToChat(line){
+        $("#chat").append("&lt;"+line["login"]+"&gt; "+line["msg"]+"<br>");
+        $("#chat").prop({scrollTop:$("#chat").prop("scrollHeight")});
+    }
+
+    function sendMsg(){
+        var login = $("#login").val();
+        var msg = $("#msg").val();
+
+        if (login==""){
+            alert("You should type your login!");
+        }
+        else if (msg==""){
+            alert("What do you want to send?");
+        }
+        else{
+            sendAjax("POST", "new", {"login": login, "msg":msg}, function(data){putToChat(data)});
+            $("#msg").val("");
+            $("#msg").focus();
+        }
+    }
+
+    setInterval(refresh,500);
+
+    function refresh(){
+        sendAjax("GET", "getList", {}, function(data){updateChat(data);});
+    }
+
+    function sendAjax(method, address, data, callback){
+        $.ajax({
+            type: method,
+            url: "/"+address,
+            data: data,
+            dataType: 'json',
+            success: callback
+        });
+    }
+</script>
+
+</body>
+</html>
